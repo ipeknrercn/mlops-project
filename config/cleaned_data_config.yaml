@@ -1,0 +1,56 @@
+# Cleaned Kaggle Telco Churn - Training Configuration
+# =====================================================
+# Bu config temizlenmiş veri için (service_combo_id ve geo_code zaten var)
+
+# Experiment name
+experiment_name: "telco-churn-cleaned-data"
+
+# Random seed
+random_state: 42
+
+# Data configuration
+data:
+  source: "data/telco_cleaned.csv"
+  test_size: 0.20
+
+# Model configuration
+model:
+  baseline:
+    type: "LogisticRegression"
+    params:
+      max_iter: 2000
+      class_weight: "balanced"
+  
+  main:
+    type: "xgboost"  # or "randomforest"
+    params:
+      n_estimators: 600
+      max_depth: 5
+      learning_rate: 0.05
+
+# Rebalancing strategy (REBALANCING design pattern)
+rebalancing:
+  use_oversampling: true
+  method: "random_oversampler"
+
+# Production thresholds
+# PRIMARY METRIC: PR-AUC (imbalanced data için en uygun!)
+thresholds:
+  production_min_pr_auc: 0.60    # PRIMARY - Kişi 2'nin kararı
+  production_min_roc_auc: 0.70   # Secondary
+  production_min_recall: 0.60    # Secondary
+  production_min_f1: 0.55        # Secondary
+
+# Model Registry
+registry:
+  model_name: "telco_churn_classifier_cleaned"
+  auto_transition_to_staging: true
+  auto_transition_to_production: false
+
+# MLOps Design Patterns (Project Requirements)
+design_patterns:
+  high_cardinality: "HASHED_FEATURE"  # FeatureHasher ile 2^18 buckets
+  feature_crosses: 3                  # contract×payment, service×contract, geo×contract
+  rebalancing: "UPSAMPLING"           # RandomOverSampler
+  ensembles: "BOOSTING"               # XGBoost (veya RandomForest=BAGGING)
+  primary_metric: "PR_AUC"            # Imbalanced data için

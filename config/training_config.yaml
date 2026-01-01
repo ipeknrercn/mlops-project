@@ -1,0 +1,36 @@
+# Telco Churn MLOps - Training Configuration
+# ==========================================
+
+# MLflow experiment adı
+experiment_name: "telco-churn-mlops"
+
+# Dataset parametreleri
+data:
+  n_samples: 4000
+  n_features: 20
+  n_informative: 10
+  n_redundant: 4
+  test_size: 0.20
+  val_size: 0.15
+  imbalance_ratio:
+    - 0.75
+    - 0.25
+  random_state: 42
+
+# Model parametreleri
+model:
+  type: "LogisticRegression"
+  max_iter: 300
+  class_weight: "balanced"
+
+# Production promotion thresholds
+thresholds:
+  production_min_roc_auc: 0.65
+  production_min_pr_auc: 0.60
+  production_min_recall: 0.45
+
+# Model Registry settings
+registry:
+  model_name: "telco_churn_classifier"
+  auto_transition_to_staging: true
+  auto_transition_to_production: false
