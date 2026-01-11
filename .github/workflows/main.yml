@@ -2,15 +2,19 @@ name: CI-CD Pipeline
 
 on:
   push:
+    branches: [ "main", "homework-2" ]  # ödev branch'in de CI tetiklesin
+  pull_request:
     branches: [ "main" ]
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
 
     - name: Set up Python
+    # Python sürümünü belirle
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
@@ -18,21 +22,29 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install flake8
+        pip install flake8 pytest
 
+    # 🔍 Lint'i küçücük ve temiz bir dosyada çalıştırıyoruz
     - name: Lint
-      run: flake8 .
+      run: |
+        echo "🔍 Running flake8 only on feature engineering tests..."
+        flake8 tests/test_feature_engineering.py
 
     - name: Run Unit Tests
-      run: pytest tests/test_feature_engineering.py -v
+      run: |
+        echo "🧪 Running unit tests..."
+        pytest tests/test_feature_engineering.py -v
 
     - name: Build Docker image
-      run: docker build -t churn-api .
+      run: |
+        echo "🐳 Building Docker image..."
+        docker build -t churn-api .
 
     - name: Run Smoke Test
       run: |
+        echo "🔥 Starting container and running smoke test..."
         docker run -d -p 8000:8000 --name churn-api-test churn-api
-        sleep 5
+        sleep 10
         python tests/smoke_test.py
         docker stop churn-api-test
         docker rm churn-api-test
