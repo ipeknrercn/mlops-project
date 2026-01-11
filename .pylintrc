@@ -1,0 +1,29 @@
+[MASTER]
+ignore=tests,venv,.venv,env
+ignore-patterns=test_.*?\.py
+
+[MESSAGES CONTROL]
+disable=
+    C0111,  # missing-docstring
+    C0103,  # invalid-name
+    R0903,  # too-few-public-methods
+    W0212,  # protected-access
+    C0301,  # line-too-long (handled by flake8)
+    R0913,  # too-many-arguments
+    R0914   # too-many-locals
+
+[FORMAT]
+max-line-length=100
+
+[DESIGN]
+max-args=10
+max-locals=20
+max-returns=6
+max-branches=15
+
+[REPORTS]
+output-format=text
+score=yes
+
+[BASIC]
+good-names=i,j,k,df,X,y,lr,dt,rf
